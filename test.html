@@ -1,0 +1,42 @@
+<tree>
+	<div class="blocks-content" id="77">
+		<form action="" method="POST" vd-bind="aaa" name="ipFilter">
+			<h2>Фильтрация по IP-адресу</h2>
+			<div class="blocks-row blocks-row_autoWidth">
+				<div class="blocks-col blocks-leftPart">Фильтрация IP адресов</div>
+				<div class="blocks-col blocks-rightPart"><label>
+						<span class="switch switch_block-item_activate">
+							<input type="checkbox" name="enabled" id="Ipfiler_enabled" value="ON" class="addfield"><span><span><span></span></span></span>
+						</span>
+					</label></div>
+			</div>
+			<div class="blocks-row">
+				<div class="blocks-col blocks-leftPart">IP-адрес</div>
+				<div class="blocks-col blocks-rightPart"><input type="text" name="ip" id="Ipfiler_ip"></div>
+			</div>
+			<div class="blocks-row">
+				<div class="blocks-col blocks-leftPart">Протокол</div>
+				<div class="blocks-col blocks-rightPart">
+					<select type="text" name="protocol" id="Ipfiler_protocol">
+						<option select value="3">TCP/UDP</option>
+						<option value="1">TCP</option>
+						<option value="2">UDP</option>
+					</select></div>
+			</div>
+
+			<div class="blocks-row">
+				<div class="blocks-col blocks-leftPart">Комментарий</div>
+				<div class="blocks-col blocks-rightPart"><input type="text" name="comment" id="Ipfiler_comment"></div>
+			</div>
+			
+			<div id="ipFilterList"></div>
+			<input type="submit" value="Применить" name="submit">
+		</form>
+	</div>
+</tree>
+<script type="text/javascript">
+	
+</script>
+<script type="text/javascript">
+	
+</script>
