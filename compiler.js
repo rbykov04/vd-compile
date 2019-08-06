@@ -36,7 +36,8 @@ function get_attr(attrs){
 
 
 function html_to_vnode(html){
-	if (!html){
+	var tree_html = get_tree(html);
+	if (!tree_html){
 		return '';
 	}
 	var tree = '';
@@ -69,10 +70,24 @@ function html_to_vnode(html){
 		var root = html.childNodes.filter(tag => tag.nodeType !=3);
 		return root[0];
 	}
-	var root =get_first_nonText_child(html);
+
+	function get_scripts(html){
+		var root = html.childNodes.filter(tag => tag.tagName&& tag.tagName == 'script');
+		var res = '';
+		root.forEach(script => script.childNodes.forEach(tag => {
+			if (tag.nodeType == 3){
+				console.log(tag.rawText);
+				res +=tag.rawText;
+			}
+		}));
+		return res;
+	}
+	var root =get_first_nonText_child(tree_html);
 	var res= "'use strict'; \n"
 	res += "const {VirtualDom}= require('virtual-dom.js');\n"
 	res += "module.exports.Ctor = function Ctor(rm, node){ \n";
+	res +=get_scripts(html);
+
 	res += "this.tree = new VirtualDom('"+root.tagName+"',"  +JSON.stringify(get_attr(root.rawAttrs))+"); \n";
 	res += "this.tree.root()\n";
 	if (root.classNames.length > 0){
@@ -101,18 +116,20 @@ function get_tree(html){
 }
 
 function compile1(data){
+	var opt = 	{
+		script: true
+	}
+
 	var html = data.toString().trim();
-	const root = parse(html);
-	var tree = get_tree(root);
-	var res = html_to_vnode(tree);
+	const root = parse(html, opt);
+	var res = html_to_vnode(root);
 	result_to_file(res);
 
 }
 
 function compile(html, file, callback){
 	const root = parse(html);
-	var tree = get_tree(root);
-	var res = html_to_vnode(tree);
+	var res = html_to_vnode(root);
 	callback(void 0, res);
 	//result_to_file({result: res});
 }
