@@ -9,6 +9,7 @@ module.exports = function vdify (file, options) {
   if (!/.vd$/.test(file)) {
     return through()
   }
+  console.log('is vd');
 
   // compiler.loadConfig()
   // compiler.applyConfig(options)
@@ -16,41 +17,34 @@ module.exports = function vdify (file, options) {
   //   sourceMap: options._flags.debug
   // })
 
-  // var data = ''
-  // var stream = through(write, end)
-  // stream.vueify = true
+  var data = ''
+  var stream = through(write, end)
+  stream.vdify = true
 
-  // function dependency (file) {
-  //   stream.emit('file', file)
-  // }
 
-  // function emitStyle (e) {
-  //   stream.emit('vueify-style', e)
-  // }
+    function write (buf) {
+      data += buf
+      // console.log(buf)
+      // console.log(data)
+    }
 
-  // function write (buf) {
-  //   data += buf
-  // }
+    function end () {
+      //stream.emit('file', file)
 
-  // function end () {
-  //   stream.emit('file', file)
-  //   compiler.on('dependency', dependency)
-  //   compiler.on('style', emitStyle)
+      compiler.compile(data, file, function (error, result) {
+        if (error) {
+          stream.emit('error', error)
+          // browserify doesn't log the stack by default...
+          console.error(error.stack.replace(/^.*?\n/, ''))
+        }
+        stream.queue(result)
+        stream.queue(null)
+      })
+    }
 
-  //   compiler.compile(data, file, function (error, result) {
-  //     compiler.removeListener('dependency', dependency)
-  //     compiler.removeListener('style', emitStyle)
-  //     if (error) {
-  //       stream.emit('error', error)
-  //       // browserify doesn't log the stack by default...
-  //       console.error(error.stack.replace(/^.*?\n/, ''))
-  //     }
-  //     stream.queue(result)
-  //     stream.queue(null)
-  //   })
-  // }
 
-  // return stream;
+
+   return stream;
 }
 
 // expose compiler
