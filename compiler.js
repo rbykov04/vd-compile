@@ -72,22 +72,20 @@ function html_to_vnode(html){
 	}
 
 	function get_scripts(html){
-		var root = html.childNodes.filter(tag => tag.tagName&& tag.tagName == 'script');
 		var res = '';
-		root.forEach(script => script.childNodes.forEach(tag => {
-			if (tag.nodeType == 3){
-				console.log(tag.rawText);
-				res +=tag.rawText;
-			}
-		}));
+
+		var root = html.childNodes.filter(tag => tag.tagName&& tag.tagName == 'script');
+		console.log()
+		root.forEach(script => script.childNodes.forEach(child => res +=child.toString()));
+		// root.forEach(e => console.log(e));
 		return res;
 	}
 	var root =get_first_nonText_child(tree_html);
-	var res= "'use strict'; \n"
+	var res= " \n'use strict'; \n"
 	res += "const {VirtualDom}= require('virtual-dom.js');\n"
 	res += "module.exports.Ctor = function Ctor(rm, node){ \n";
 	res +=get_scripts(html);
-
+	res += ' \n';
 	res += "this.tree = new VirtualDom('"+root.tagName+"',"  +JSON.stringify(get_attr(root.rawAttrs))+"); \n";
 	res += "this.tree.root()\n";
 	if (root.classNames.length > 0){
