@@ -1,0 +1,13 @@
+{
+  "name": "vd-compile",
+  "version": "0.0.1",
+  "description": "vd-compile",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "js-html-parser": "^1.0.7"
+  },
+  "keywords": [],
+  "author": "",
+  "license": ""
+}
