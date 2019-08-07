@@ -7,34 +7,43 @@ const { parse } = require('js-html-parser');
 
 function get_attr(attrs){
 	if (!attrs){
-		return {};
+		return '{}';
 	}
-	var res = {};
-	attrs.split('" ')
-		.map(attr=> attr.split('='))
-		.map(arr =>({key: arr[0], value: arr[1]}))
-		.filter(el => el.key!='class')		
-		.map(el => {
-			if (!el.value){
-				return {key: el.key, value: 'undef'};
-			}
-			var value = el.value;
-			if(value.startsWith('"')){
-				value = value.substring(1);
-			}			
-
-			if(value.endsWith('"')){
-				var l = value.length;
-				value = value.substring(0, l -1);
-			}
-			return {key: el.key, value: value};
-		})
-		.forEach(el => res[el.key] =el.value);
-	return res;
+	var res = [];
+	var text_attr =attrs.match(/(\w*)=("[A-Za-z0-9_А-Яа-я ]*")/g);
+	if (text_attr) {
+		var arr = text_attr
+				.filter(attr => !/class/g.test(attr))
+				.map(attr => attr.replace('=', ':'));
+		Array.prototype.push.apply(res, arr);
+	}
+	var js_attr =attrs.match(/([@\:A-Za-z0-9_-]*)=([^"]\w*)/g);
+	if (js_attr) {
+		var arr = js_attr
+			.filter(attr => /js:([\w]*)=([^"]\w*)/g.test(attr))
+			.map(attr => attr.replace('js:', ''))
+			.map(attr => attr.replace('=', ':'));
+		Array.prototype.push.apply(res, arr);
+	}	
+	console.log('{'+res.join(', ') +'}')
+	return '{'+res.join(', ') +'}';
 
 }
 
+function get_bind(attrs){
+	if (!attrs){
+		return void 0;
+	}
+	if (!/diode/g.test(attrs)){
+		return void 0;
+	}
+	var bind = /vd-bind=([^"]\w*)/g.exec(attrs);
+	if (!bind){
+		return void 0;
+	}
+	return bind[1];
 
+}
 function html_to_vnode(html){
 	var tree_html = get_tree(html);
 	if (!tree_html){
@@ -54,10 +63,14 @@ function html_to_vnode(html){
 				return;
 			}
 
-			tree +="	".repeat(deep) + ".child('"+tag.tagName+"',"  +JSON.stringify(get_attr(tag.rawAttrs))+")";
+			tree +="	".repeat(deep) + ".child('"+tag.tagName+"',"  +get_attr(tag.rawAttrs)+")";
 			
 			if (tag.classNames.length > 0){
 				tree +=".set_class('"+tag.classNames.join(' ')+"')";
+			}
+			var bind = get_bind(tag.rawAttrs);
+			if (bind){
+				tree +=".bind("+bind+")";
 			}
 			tree += '\n'
 			deep = deep +1;
@@ -68,6 +81,7 @@ function html_to_vnode(html){
 	}
 	function get_first_nonText_child(html){
 		var root = html.childNodes.filter(tag => tag.nodeType !=3);
+
 		return root[0];
 	}
 
@@ -86,11 +100,15 @@ function html_to_vnode(html){
 	res += "module.exports.Ctor = function Ctor(rm, node){ \n";
 	res +=get_scripts(html);
 	res += ' \n';
-	res += "this.tree = new VirtualDom('"+root.tagName+"',"  +JSON.stringify(get_attr(root.rawAttrs))+"); \n";
+	res += "this.tree = new VirtualDom('"+root.tagName+"',"  +get_attr(root.rawAttrs)+"); \n";
 	res += "this.tree.root()\n";
 	if (root.classNames.length > 0){
 		res +=".set_class('"+root.classNames.join(' ')+"')";
 	}
+	var bind = get_bind(root.rawAttrs);
+	if (bind){
+		tree +=".bind("+bind+")";
+	}	
 	html_to_vnode_recursive(root);
 	res+=tree;
 	res += "}"
