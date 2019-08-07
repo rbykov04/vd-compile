@@ -53,7 +53,7 @@ function html_to_vnode(html){
 				if (/^[\t\r\n]+$/.test(tag.rawText)){
 					return;
 				}
-				tree +="	".repeat(deep) + '.text("'+tag.rawText+'")\n';
+				tree +="	".repeat(deep) + '.text(`'+tag.rawText+'`)\n';
 			}
 			if (!tag.tagName){
 				return;
