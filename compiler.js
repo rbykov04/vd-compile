@@ -25,16 +25,12 @@ function get_attr(attrs){
 			.map(attr => attr.replace('=', ':'));
 		Array.prototype.push.apply(res, arr);
 	}	
-	console.log('{'+res.join(', ') +'}')
 	return '{'+res.join(', ') +'}';
 
 }
 
 function get_bind(attrs){
 	if (!attrs){
-		return void 0;
-	}
-	if (!/diode/g.test(attrs)){
 		return void 0;
 	}
 	var bind = /vd-bind=([^"]\w*)/g.exec(attrs);
@@ -89,7 +85,6 @@ function html_to_vnode(html){
 		var res = '';
 
 		var root = html.childNodes.filter(tag => tag.tagName&& tag.tagName == 'script');
-		console.log()
 		root.forEach(script => script.childNodes.forEach(child => res +=child.toString()));
 		// root.forEach(e => console.log(e));
 		return res;

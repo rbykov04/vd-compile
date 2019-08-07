@@ -9,7 +9,6 @@ module.exports = function vdify (file, options) {
   if (!/.vd$/.test(file)) {
     return through()
   }
-  console.log('is vd');
 
   // compiler.loadConfig()
   // compiler.applyConfig(options)
