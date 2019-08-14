@@ -10,7 +10,7 @@ function get_attr(attrs){
 		return '{}';
 	}
 	var res = [];
-	var text_attr =attrs.match(/(\w*)=("[A-Za-z0-9_А-Яа-я .-]*")/g);
+	var text_attr =attrs.match(/(\w*)=("[:/_A-Za-z0-9_А-Яа-я .-]*")/g);
 	if (text_attr) {
 		var arr = text_attr
 				.filter(attr => !/class/g.test(attr))
