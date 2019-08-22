@@ -10,7 +10,7 @@ function get_attr(attrs){
 		return '{}';
 	}
 	var res = [];
-	var text_attr =attrs.match(/(\w*)=("[:/_A-Za-z0-9_А-Яа-я .-]*")/g);
+	var text_attr =attrs.match(/(\w*)=("[#:/_A-Za-z0-9_А-Яа-я .-]*")/g);
 	if (text_attr) {
 		var arr = text_attr
 				.filter(attr => !/class/g.test(attr))
@@ -28,7 +28,16 @@ function get_attr(attrs){
 	return '{'+res.join(', ') +'}';
 
 }
-
+function get_directive(attrs){
+	if (!attrs){
+		return void 0;
+	}
+	var bind = /vd-([\w-]*)=([^"]\w*)/g.exec(attrs);
+	if (!bind){
+		return void 0;
+	}
+	return {directive: bind[1], attr: bind[2]};
+}
 function get_bind(attrs){
 	if (!attrs){
 		return void 0;
@@ -68,6 +77,10 @@ function html_to_vnode(html){
 			if (bind){
 				tree +=".bind("+bind+")";
 			}
+			var d = get_directive(tag.rawAttrs);
+			if (d){
+				tree +=".directive('"+d.directive+"',"+d.attr+")";
+			}
 			tree += '\n'
 			deep = deep +1;
 			html_to_vnode_recursive(tag);
@@ -103,7 +116,11 @@ function html_to_vnode(html){
 	var bind = get_bind(root.rawAttrs);
 	if (bind){
 		tree +=".bind("+bind+")";
-	}	
+	}
+	var d = get_directive(root.rawAttrs);
+	if (d){
+		tree +=".directive('"+d.directive+"',"+d.attr+")";
+	}
 	html_to_vnode_recursive(root);
 	res+=tree;
 	res += "}"
