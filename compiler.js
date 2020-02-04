@@ -4,27 +4,36 @@ const fs = require('fs')
 const { parse } = require('js-html-parser');
 
 
-
 function get_attr(attrs){
 	if (!attrs){
 		return '{}';
 	}
 	var res = [];
-	var text_attr =attrs.match(/(\w*)=("[#:/_A-Za-z0-9_А-Яа-я .-]*")/g);
-	if (text_attr) {
-		var arr = text_attr
-				.filter(attr => !/class/g.test(attr))
-				.map(attr => attr.replace('=', ':'));
-		Array.prototype.push.apply(res, arr);
-	}
-	var js_attr =attrs.match(/([@\:A-Za-z0-9_-]*)=([^"]\w*)/g);
+	var js_attr =attrs.match(/([@\:A-Za-z0-9_-]*)=([^"][\w.]*)/g);
 	if (js_attr) {
 		var arr = js_attr
 			.filter(attr => /js:([\w]*)=([^"]\w*)/g.test(attr))
 			.map(attr => attr.replace('js:', ''))
 			.map(attr => attr.replace('=', ':'));
 		Array.prototype.push.apply(res, arr);
-	}	
+	}
+	var text_attr =attrs.match(/([:-\w]*)=("[()#:\/_.A-Za-z0-9_А-Яа-я -;]*")/g);
+	if (text_attr) {
+	// console.log("text_attr", text_attr);
+		var links = text_attr
+				.filter(attr => !/class/g.test(attr))
+				.filter(attr => /(\w*[:|-]\w*)=("[()#:\/_.A-Za-z0-9_А-Яа-я -;]*")/g.test(attr))
+				.map(attr => '"' +attr.replace('=', '":'));
+		Array.prototype.push.apply(res, links);
+	// console.log("links", links);
+		var texts = text_attr
+				.filter(attr => !/class/g.test(attr))
+				.filter(attr => !/(\w*[:|-]\w*)=("[()#:\/_.A-Za-z0-9_А-Яа-я -;]*")/g.test(attr))
+				.map(attr => attr.replace('=', ':'));
+				// console.log("texts", texts);
+		Array.prototype.push.apply(res, texts);
+	}
+
 	return '{'+res.join(', ') +'}';
 
 }
